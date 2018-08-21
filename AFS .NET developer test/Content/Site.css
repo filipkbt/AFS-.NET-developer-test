@@ -22,3 +22,13 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.centered {
+    float: none;
+    text-align: center;
+}
+#listBoxTranslationType {
+    display: block;
+    margin: 0 auto;
+}
+
