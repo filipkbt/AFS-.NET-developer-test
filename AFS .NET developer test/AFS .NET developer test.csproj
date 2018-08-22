@@ -161,8 +161,23 @@
     <Compile Include="Migrations\201808202014486_AddTranslationModel.Designer.cs">
       <DependentUpon>201808202014486_AddTranslationModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201808212314112_EditTranslationAddSuccessAndContents.cs" />
+    <Compile Include="Migrations\201808212314112_EditTranslationAddSuccessAndContents.Designer.cs">
+      <DependentUpon>201808212314112_EditTranslationAddSuccessAndContents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808212352056_addErrorModel.cs" />
+    <Compile Include="Migrations\201808212352056_addErrorModel.Designer.cs">
+      <DependentUpon>201808212352056_addErrorModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808220041056_fix.cs" />
+    <Compile Include="Migrations\201808220041056_fix.Designer.cs">
+      <DependentUpon>201808220041056_fix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\contents.cs" />
     <Compile Include="Models\DbContextModel.cs" />
+    <Compile Include="Models\error.cs" />
+    <Compile Include="Models\success.cs" />
     <Compile Include="Models\TranslationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -245,6 +260,7 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
+    <Content Include="Views\Home\PreviousTranslations.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -255,6 +271,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201808202014486_AddTranslationModel.resx">
       <DependentUpon>201808202014486_AddTranslationModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808212314112_EditTranslationAddSuccessAndContents.resx">
+      <DependentUpon>201808212314112_EditTranslationAddSuccessAndContents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808212352056_addErrorModel.resx">
+      <DependentUpon>201808212352056_addErrorModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808220041056_fix.resx">
+      <DependentUpon>201808220041056_fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 
 
 <script type="text/javascript">
+
  $(function() {
      $('#btnTranslateText').on('click', function () {
          var text = document.getElementById("textToTranslate").value;
@@ -21,15 +22,24 @@
                 dataType: "json",
                  success: function (response) {
                      if (response.success) {
+                         $("#alertTranslatedText").addClass('show');
+                         document.getElementById("translatedText").innerText = response.translated;
                          alert("text : " + text + ", type" + translationType);
                      } else {
+                         alert(response.translated);
+
+                         $("#alertTranslatedText").addClass('show');
+                         document.getElementById("translatedText").innerText = response.translated;
                          alert("Something went wrong");
                     }
                 },
                 failure: function(response) {
                 alert("zle");
                 },
-                error: function(response) {
+                 error: function (response) {
+                     alert(response.translated);
+                     $("#alertTranslatedText").addClass('show');
+                     document.getElementById("translatedText").innerText = response.translated;
                     alert("zle dasdas");
                 }
                 });
@@ -40,28 +50,33 @@
 
 @Html.AntiForgeryToken()
 <div class="card col " style="margin-top:20px; margin-bottom:20px">
+    <div class="card-header bg-dark">
+        <h2 class="text-info">Translator</h2>
+    </div>
     <div class="card-body">
-        <div>
-            <div class="col">
-                <h3>Text to translate</h3>
-                <textarea class="form-control col-12" rows="5" id="textToTranslate"></textarea>
-            </div>
+        <div class="col">
+            <h3>Text to translate</h3>
+            <textarea class="form-control col-12" rows="5" id="textToTranslate"></textarea>
         </div>
-        <div>
-            <div class="col">
-                <label>Translation type</label>
-                <select class="form-control col-3 " id="listBoxTranslationType" align="center">
-                    <option>leetspeak</option>
-                    <option>cockney</option>
-                    <option>fudd</option>
-                    <option>yoda</option>
-                </select>
-            </div>
+        <div class="col">
+            <label>Translation type</label>
+            <select class="form-control col-3 " id="listBoxTranslationType" align="center">
+                <option>leetspeak</option>
+                <option>cockney</option>
+                <option>fudd</option>
+                <option>yoda</option>
+            </select>
         </div>
-        <div>
-            <div class="col">
-                <div type="button" class="btn-info" id="btnTranslateText">Translate text</div>
-            </div>
+        <div class="col">
+            <div type="button" class="btn btn-success col-3" id="btnTranslateText">Translate text</div>
+        </div>
+        <div class="col alert alert-success alert-dismissible fade collapse" role="alert" id="alertTranslatedText" aria-hidden="true">
+            <h4 class="alert-heading">Translated text</h4>
+            <hr />
+            <label id="translatedText"> </label>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     </div>
 </div>

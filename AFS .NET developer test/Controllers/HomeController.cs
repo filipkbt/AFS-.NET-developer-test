@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -19,12 +21,6 @@ namespace AFS.NET_developer_test.Controllers
             return View();
         }
 
-        [HttpGet]
-        public PartialViewResult TranslateText()
-        {
-            return PartialView("_translateForm");
-        }
-
         [HttpPost]
         public async Task<JsonResult> TranslateTextAsync(string text, string translationType)
         {
@@ -36,37 +32,76 @@ namespace AFS.NET_developer_test.Controllers
                 client.BaseAddress = new Uri(BaseAddress);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                string jsonText = JsonConvert.SerializeObject(new {text = text});
+                string jsonText = JsonConvert.SerializeObject(new { text = text });
 
                 var response = await client.PostAsync(BaseAddress, new StringContent(jsonText, Encoding.UTF8, "application/json"));
 
+                string responseTranslation = response.Content.ReadAsStringAsync().Result;
+                var deserializedResponseTranslation = JsonConvert.DeserializeObject<TranslationModel>(responseTranslation);
 
+                TranslationModel translation = new TranslationModel();
+                translation.Contents = new contents{ TranslationId = translation };
+                translation.Success = new success{ TranslationId = translation };
+                
+                translation.IsSuccessStatusCode = response.IsSuccessStatusCode;
+                translation.Date = DateTime.Now;
+                
                 if (response.IsSuccessStatusCode)
                 {
-                    TranslationModel translation = new TranslationModel();
-                    //translation.Text = deserializedResponseTranslation.Text;
-                    //translation.TranslationType = deserializedResponseTranslation.TranslationType;
-                    //translation.Translated = deserializedResponseTranslation.Translated;
-                    return Json(new { success = true, responseText = "OK." }, JsonRequestBehavior.AllowGet);
+                    translation.Contents.text = deserializedResponseTranslation.Contents.text;
+                    translation.Contents.translation = deserializedResponseTranslation.Contents.translation;
+                    translation.Contents.translated = deserializedResponseTranslation.Contents.translated;
+                    translation.StatusCode = response.StatusCode.ToString();
+                    translation.Success.total = deserializedResponseTranslation.Success.total;
+
+                    AddTranslation(translation);
+                    return Json(new { success = true, responseText = "OK.", translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
-                    return Json(new { success = false, responseText = "NIE OK" }, JsonRequestBehavior.AllowGet);
+                    translation.Error = new error { TranslationId = translation };
+                    translation.Error.code = deserializedResponseTranslation.Error.code;
+                    translation.Error.message = deserializedResponseTranslation.Error.message;
+                    translation.Contents.text = text;
+                    translation.Contents.translation = translationType;
+                    translation.Contents.translated = null;
+
+                    AddTranslation(translation);
+                    return Json(new { success = false, responseText = "NIE OK", translated = "gownooooo" }, JsonRequestBehavior.AllowGet);
                 }
             }
         }
 
-        //public async Task<TranslationModel> AddTranslationAsync(TranslationModel Translation)
-        //{
-        //    using (DbContextModel DbContext = new DbContextModel())
-        //    {
+        public bool AddTranslation(TranslationModel translation)
+        {
+            using (DbContextModel DbContext = new DbContextModel())
+            {
+                try
+                {
+                    DbContext.Translations.Add(translation);
+                    DbContext.SaveChanges();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+        }
 
-        //    }
-        //}
+        public ActionResult PreviousTranslations()
+        {
+            return View();
+        }
 
-        //public async Task<List<TranslationModel>> GetTranslationsAsync()
-        //{
+        public async Task<List<TranslationModel>> GetTranslationsAsync()
+        {
+            using (DbContextModel DbContext = new DbContextModel())
+            {
+                var translationsList = await Task.Run(() => DbContext.Translations.ToList());
 
-        //}
+                return translationsList;
+            }
+        }
     }
 }
