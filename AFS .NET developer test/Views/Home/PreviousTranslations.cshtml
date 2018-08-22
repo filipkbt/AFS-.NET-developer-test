@@ -5,13 +5,32 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="card col" style="margin-top:20px; margin-bottom:20px">
-    <div class="card-header bg-dark text-white"><h2>Previous translations</h2></div>
+<div class="card " style="margin-top:20px; margin-bottom:20px">
+    <div class="card-header bg-dark text-white "><h2>Previous translations</h2></div>
+    <h3 style="margin-top:10px">All results: @ViewBag.countAllResult</h3>
+    <div class="progress" style="height:50px; margin-top:10px;margin-bottom:10px;margin-left:25px;margin-right:25px;">
+        <div class="progress-bar bg-success" aria-valuenow="@ViewBag.CountProperlyTranslations" aria-valuemin="0" aria-valuemax="@ViewBag.countAllResults" value="@ViewBag.CountProperlyTranslations" id="progressBarProperlyTranslations" role="progressbar" style="width:@ViewBag.progressBarProperlyTranslationsWidth%;" >
+            <b>Properly translations: @ViewBag.CountProperlyTranslations</b>
+        </div>
+        <div class="progress-bar bg-danger" aria-valuenow="@ViewBag.CountErrors" aria-valuemin="0" aria-valuemax="@ViewBag.countAllResults" value="@ViewBag.CountErrors" id="progressBarErrors" role="progressbar" style="width:@ViewBag.progressBarErrorsWidth%;" >
+            <b>Errors: @ViewBag.CountErrors</b>
+        </div>
+    </div>
+    @using (Html.BeginForm("PreviousTranslations", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        <div class="form-group">
+            @Html.RadioButton("filteredResults", "properlyTranslations", new { @class = "radioButton" })  Show only properly translations
+            @Html.RadioButton("filteredResults", "errors", new { @class = "radioButton" }) Show only errors
+            <div class="text-center">
+                <button class="btn btn-success col-4" type="submit" style="margin-left:10px; margin-top:10px;">Filter</button>
+            </div>
+        </div>
+    }
+
     <div class="card-body centered">
-        <div>
-            <div class="row">
-                @foreach (var translation in Model)
-                {
+        <div class="row">
+            @foreach (var translation in Model)
+            {
                 <div class="col-3" style="margin-top:5px">
                     <div class="card text-center">
                         <div class="card-body">
@@ -20,39 +39,29 @@
                             <h6 class="card-subtitle  text-info" style="margin-top:5px">
                                 <b>Is success:</b>
                                 @if (translation.IsSuccessStatusCode == true)
-                {
-                    <text>Yes</text>
-}
-else
-{
-                <text>No</text>
-}
+                                {
+                                    <text>Yes</text>
+                                }
+                                else
+                                {
+                                    <text>No</text>
+                                }
                             </h6>
                             <p class="card-text" style="margin-top:5px"><b>Text: </b>@translation.Contents.text</p>
                             <p class="card-text" style="margin-top:5px"><b>Translation type: </b>@translation.Contents.translation</p>
                             @if (translation.Contents.translated != null)
-            {
-                <p class="card-text" style="margin-top:5px"><b>Translation:  </b>@translation.Contents.translated</p>
-}
+                            {
+                                <p class="card-text" style="margin-top:5px"><b>Translation:  </b>@translation.Contents.translated</p>
+                            }
                             @if (translation.Error != null)
-            {
-                <p class="card-text" style="margin-top:5px"><b>Error code: </b>@translation.Error.code</p>
-                <p class="card-text" style="margin-top:5px"><b>Error message: </b>@translation.Error.message</p>
-}
+                            {
+                                <p class="card-text" style="margin-top:5px"><b>Error code: </b>@translation.Error.code</p>
+                                <p class="card-text" style="margin-top:5px"><b>Error message: </b>@translation.Error.message</p>
+                            }
                         </div>
                     </div>
                 </div>
-                }
-            </div>
-        </div>
-        <div>
-            <div class="col">
-
-            </div>
-        </div>
-        <div>
-            <div class="col">
-            </div>
+            }
         </div>
     </div>
 </div>

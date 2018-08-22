@@ -32,7 +32,12 @@
                      } else {
                          $("#alertErrorTranslating").addClass('show');
                          $("#alertTranslatedText").addClass('hide');
-                         document.getElementById("errorMessage").innerText = "Error code: " + response.errorCode + " Message: " + response.errorMessage;
+                         if (response.errorCode != null) {
+                             document.getElementById("errorMessage").innerText = "Error code: " + response.errorCode + " Message: " + response.errorMessage;
+                         }
+                         else {
+                             document.getElementById("errorMessage").innerText = response.message;
+                         }
                     }
                 },
                  failure: function (response) {

@@ -26,6 +26,11 @@ namespace AFS.NET_developer_test.Controllers
         {
             var _translationTypeUri = "/" + translationType + ".json";
 
+            if(text == "")
+            {
+                return Json(new { success = false, message = "Write text you want to translate!" }, JsonRequestBehavior.AllowGet);
+            }
+
             using (var client = new HttpClient())
             {
                 string BaseAddress = _baseTranslationsUri + _translationTypeUri;
@@ -55,7 +60,7 @@ namespace AFS.NET_developer_test.Controllers
                     translation.Success.total = deserializedResponseTranslation.Success.total;
 
                     AddTranslation(translation);
-                    return Json(new { success = true, responseText = "OK.", translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
+                    return Json(new { success = true, translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
@@ -89,12 +94,23 @@ namespace AFS.NET_developer_test.Controllers
             }
         }
 
-        public ActionResult PreviousTranslations()
+        public ActionResult PreviousTranslations(string filteredResults)
         {
-            return View(GetTranslations());
+            var resultsList = GetTranslations(filteredResults);
+            int countProperlyTranslations = resultsList.Where(x => x.IsSuccessStatusCode == true).Count();
+            int countErrors = resultsList.Where(x => x.IsSuccessStatusCode == false).Count();
+            ViewBag.CountProperlyTranslations = countProperlyTranslations;
+            ViewBag.CountErrors = countErrors;
+            double countAllResults = ViewBag.CountProperlyTranslations + ViewBag.CountErrors;
+            ViewBag.countAllResults = countAllResults;
+            var progressBarProperlyTranslationsWidth = (((double)countProperlyTranslations / (double)countAllResults) * 100).ToString();
+            var progressBarErrorsWidth = (((double)countErrors / (double)countAllResults) * 100).ToString();
+            ViewBag.progressBarProperlyTranslationsWidth = progressBarProperlyTranslationsWidth.Replace(",", "."); 
+            ViewBag.progressBarErrorsWidth = progressBarErrorsWidth.Replace(",", "."); 
+            return View(resultsList);
         }
 
-        public IEnumerable<TranslationModel> GetTranslations()
+        public IEnumerable<TranslationModel> GetTranslations(string filteredResults)
         {
             using (DbContextModel DbContext = new DbContextModel())
             {
@@ -102,7 +118,20 @@ namespace AFS.NET_developer_test.Controllers
                                                 .Include("contents")
                                                 .Include("error")
                                                 .Include("success")
+                                                .OrderByDescending(x=> x.Date)
                                                 .ToList();
+
+                if (filteredResults == "properlyTranslations")
+                {
+                    var filteredTranslationsList = translationsList.Where(x => x.IsSuccessStatusCode == true).ToList();
+                    return filteredTranslationsList;
+                }
+
+                else if (filteredResults == "errors")
+                {
+                    var filteredTranslationsList = translationsList.Where(x => x.IsSuccessStatusCode == false).ToList();
+                    return filteredTranslationsList;
+                }
 
                 return translationsList;
             }

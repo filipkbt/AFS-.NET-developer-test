@@ -15,7 +15,7 @@
             </div>
             <div class="btn-group" role="group">
                 <div class="btn btn-success" onclick="location.href='@Url.Action("Index")'">Translator</div>
-                <div class="btn btn-success" onclick="location.href='@Url.Action("PreviousTranslations")'">Previous translations</div>
+                <div class="btn btn-success" onclick="location.href='@Url.Action("PreviousTranslations", "Home", new { filteredResults ="" })'">Previous translations</div>
             </div>
         </div>
     </div>
@@ -31,6 +31,5 @@
         </div>
 
     </footer>
-
 </body>
 </html>
