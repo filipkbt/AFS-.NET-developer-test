@@ -5,6 +5,54 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<div class="card col" style="margin-top:20px; margin-bottom:20px">
+    <div class="card-header bg-dark text-white"><h2>Previous translations</h2></div>
+    <div class="card-body centered">
+        <div>
+            <div class="row">
+                @foreach (var translation in Model)
+                {
+                <div class="col-3" style="margin-top:5px">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <div class="card-header bg-dark text-white h4">Result</div>
+                            <h6 class="card-subtitle text-info" style="margin-top:5px">@translation.Date</h6>
+                            <h6 class="card-subtitle  text-info" style="margin-top:5px">
+                                <b>Is success:</b>
+                                @if (translation.IsSuccessStatusCode == true)
+                {
+                    <text>Yes</text>
+}
+else
+{
+                <text>No</text>
+}
+                            </h6>
+                            <p class="card-text" style="margin-top:5px"><b>Text: </b>@translation.Contents.text</p>
+                            <p class="card-text" style="margin-top:5px"><b>Translation type: </b>@translation.Contents.translation</p>
+                            @if (translation.Contents.translated != null)
+            {
+                <p class="card-text" style="margin-top:5px"><b>Translation:  </b>@translation.Contents.translated</p>
+}
+                            @if (translation.Error != null)
+            {
+                <p class="card-text" style="margin-top:5px"><b>Error code: </b>@translation.Error.code</p>
+                <p class="card-text" style="margin-top:5px"><b>Error message: </b>@translation.Error.message</p>
+}
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        <div>
+            <div class="col">
 
-
-</table>
+            </div>
+        </div>
+        <div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+</div>

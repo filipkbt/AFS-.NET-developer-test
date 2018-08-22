@@ -45,7 +45,7 @@ namespace AFS.NET_developer_test.Controllers
                 
                 translation.IsSuccessStatusCode = response.IsSuccessStatusCode;
                 translation.Date = DateTime.Now;
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     translation.Contents.text = deserializedResponseTranslation.Contents.text;
@@ -59,15 +59,15 @@ namespace AFS.NET_developer_test.Controllers
                 }
                 else
                 {
-                    translation.Error = new error { TranslationId = translation };
-                    translation.Error.code = deserializedResponseTranslation.Error.code;
-                    translation.Error.message = deserializedResponseTranslation.Error.message;
                     translation.Contents.text = text;
                     translation.Contents.translation = translationType;
                     translation.Contents.translated = null;
+                    translation.Error = new error { TranslationId = translation };
+                    translation.Error.code = deserializedResponseTranslation.Error.code;
+                    translation.Error.message = deserializedResponseTranslation.Error.message;                   
 
                     AddTranslation(translation);
-                    return Json(new { success = false, responseText = "NIE OK", translated = "gownooooo" }, JsonRequestBehavior.AllowGet);
+                    return Json(new { success = false, errorCode = deserializedResponseTranslation.Error.code , errorMessage = deserializedResponseTranslation.Error.message}, JsonRequestBehavior.AllowGet);
                 }
             }
         }
@@ -91,14 +91,18 @@ namespace AFS.NET_developer_test.Controllers
 
         public ActionResult PreviousTranslations()
         {
-            return View();
+            return View(GetTranslations());
         }
 
-        public async Task<List<TranslationModel>> GetTranslationsAsync()
+        public IEnumerable<TranslationModel> GetTranslations()
         {
             using (DbContextModel DbContext = new DbContextModel())
             {
-                var translationsList = await Task.Run(() => DbContext.Translations.ToList());
+                var translationsList = DbContext.Translations
+                                                .Include("contents")
+                                                .Include("error")
+                                                .Include("success")
+                                                .ToList();
 
                 return translationsList;
             }

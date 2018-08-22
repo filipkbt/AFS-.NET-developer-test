@@ -7,51 +7,57 @@
 
 <script type="text/javascript">
 
+    $("#btn").on('click', function () {
+        var $this = $(this);
+        $this.button('loading');
+        setTimeout(function () {
+            $this.button('reset');
+        }, 8000);
+    });
  $(function() {
      $('#btnTranslateText').on('click', function () {
          var text = document.getElementById("textToTranslate").value;
          var translationType = document.getElementById("listBoxTranslationType").value;
-         alert(text);
-         alert(translationType);
          if (text != null && translationType != null) {
              $.ajax({
                 type: "POST",
                 url: '@Url.Action("TranslateTextAsync")',
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify({ 'text': text, 'translationType': translationType }),
-                dataType: "json",
+                 dataType: "json", 
                  success: function (response) {
                      if (response.success) {
                          $("#alertTranslatedText").addClass('show');
                          document.getElementById("translatedText").innerText = response.translated;
-                         alert("text : " + text + ", type" + translationType);
                      } else {
-                         alert(response.translated);
-
-                         $("#alertTranslatedText").addClass('show');
-                         document.getElementById("translatedText").innerText = response.translated;
-                         alert("Something went wrong");
+                         $("#alertErrorTranslating").addClass('show');
+                         $("#alertTranslatedText").addClass('hide');
+                         document.getElementById("errorMessage").innerText = "Error code: " + response.errorCode + " Message: " + response.errorMessage;
                     }
                 },
-                failure: function(response) {
-                alert("zle");
+                 failure: function (response) {
+                     $("#alertErrorTranslating").addClass('show');
+                     $("#alertTranslatedText").addClass('hide');
+                     document.getElementById("errorMessage").innerText = "Error code: " + response.errorCode + " Message: " + response.errorMessage;
                 },
                  error: function (response) {
-                     alert(response.translated);
-                     $("#alertTranslatedText").addClass('show');
-                     document.getElementById("translatedText").innerText = response.translated;
-                    alert("zle dasdas");
+                     $("#alertErrorTranslating").addClass('show');
+                     $("#alertTranslatedText").addClass('hide');
+                     document.getElementById("errorMessage").innerText = "Error code: " + response.errorCode + " Message: " + response.errorMessage;
                 }
                 });
                 }
                 });
-                });
+    });
+
+
 </script>
+
 
 @Html.AntiForgeryToken()
 <div class="card col " style="margin-top:20px; margin-bottom:20px">
     <div class="card-header bg-dark">
-        <h2 class="text-info">Translator</h2>
+        <h2 class="text-white">Translator</h2>
     </div>
     <div class="card-body">
         <div class="col">
@@ -68,7 +74,7 @@
             </select>
         </div>
         <div class="col">
-            <div type="button" class="btn btn-success col-3" id="btnTranslateText">Translate text</div>
+            <div type="button" class="btn btn-success col-3" id="btnTranslateText" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Translation is in progres...">Translate text</div>
         </div>
         <div class="col alert alert-success alert-dismissible fade collapse" role="alert" id="alertTranslatedText" aria-hidden="true">
             <h4 class="alert-heading">Translated text</h4>
@@ -78,29 +84,14 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-    </div>
-</div>
 
-<div class="card col" style="margin-top:20px; margin-bottom:20px">
-    <div class="card-header"><h2>Previous translations</h2></div>
-    <div class="card-body centered">
-        <div>
-            <div class="col">
-
-            </div>
-        </div>
-        <div>
-            <div class="col">
-
-            </div>
-        </div>
-        <div>
-            <div class="col">
-            </div>
+        <div class="col alert alert-danger alert-dismissible fade collapse" role="alert" id="alertErrorTranslating" aria-hidden="true">
+            <h4 class="alert-heading">Error!</h4>
+            <hr />
+            <label id="errorMessage"> </label>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     </div>
 </div>
-
-
-
-
