@@ -37,7 +37,7 @@ namespace AFS.NET_developer_test.Tests.Controllers
         [TestCase("", "")]
         [TestCase("test", "")]
         [TestCase("", "test")]
-        [TestCase("test text", "leet speak")]
+        [TestCase("test text", "leet_speak")]
         public async Task TestTranslateTextAsyncShouldReturnFalse(string text, string translationType)
         {
             var jsonResult = await _homeController.TranslateTextAsync(text, translationType) as JsonResult;
@@ -64,7 +64,7 @@ namespace AFS.NET_developer_test.Tests.Controllers
         {
             TranslationModel translation = new TranslationModel();
 
-            Assert.IsTrue(_homeController.AddTranslation(translation));
+            Assert.AreEqual(_homeController.AddTranslation(translation),false);
         }
 
         [TestCase("properlyTranslations")]

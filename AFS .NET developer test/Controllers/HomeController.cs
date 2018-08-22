@@ -26,55 +26,55 @@ namespace AFS.NET_developer_test.Controllers
         {
             var _translationTypeUri = "/" + translationType + ".json";
 
-            if (text == "" || translationType == "")
+            if ((text == "" || translationType == "") || (text == "" && translationType == ""))
             {
                 return Json(new { success = false, message = "Write text you want to translate!" }, JsonRequestBehavior.AllowGet);
             }
 
-                using (var client = new HttpClient())
+            using (var client = new HttpClient())
+            {
+                string BaseAddress = _baseTranslationsUri + _translationTypeUri;
+                client.BaseAddress = new Uri(BaseAddress);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                string jsonText = JsonConvert.SerializeObject(new { text = text });
+
+                var response = await client.PostAsync(BaseAddress, new StringContent(jsonText, Encoding.UTF8, "application/json"));
+
+                string responseTranslation = response.Content.ReadAsStringAsync().Result;
+                var deserializedResponseTranslation = JsonConvert.DeserializeObject<TranslationModel>(responseTranslation);
+
+                TranslationModel translation = new TranslationModel();
+                translation.Contents = new contents { TranslationId = translation };
+                translation.Success = new success { TranslationId = translation };
+
+                translation.IsSuccessStatusCode = response.IsSuccessStatusCode;
+                translation.Date = DateTime.Now;
+
+                if (response.IsSuccessStatusCode)
                 {
-                    string BaseAddress = _baseTranslationsUri + _translationTypeUri;
-                    client.BaseAddress = new Uri(BaseAddress);
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    translation.Contents.text = deserializedResponseTranslation.Contents.text;
+                    translation.Contents.translation = deserializedResponseTranslation.Contents.translation;
+                    translation.Contents.translated = deserializedResponseTranslation.Contents.translated;
+                    translation.StatusCode = response.StatusCode.ToString();
+                    translation.Success.total = deserializedResponseTranslation.Success.total;
 
-                    string jsonText = JsonConvert.SerializeObject(new { text = text });
-
-                    var response = await client.PostAsync(BaseAddress, new StringContent(jsonText, Encoding.UTF8, "application/json"));
-
-                    string responseTranslation = response.Content.ReadAsStringAsync().Result;
-                    var deserializedResponseTranslation = JsonConvert.DeserializeObject<TranslationModel>(responseTranslation);
-
-                    TranslationModel translation = new TranslationModel();
-                    translation.Contents = new contents { TranslationId = translation };
-                    translation.Success = new success { TranslationId = translation };
-
-                    translation.IsSuccessStatusCode = response.IsSuccessStatusCode;
-                    translation.Date = DateTime.Now;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        translation.Contents.text = deserializedResponseTranslation.Contents.text;
-                        translation.Contents.translation = deserializedResponseTranslation.Contents.translation;
-                        translation.Contents.translated = deserializedResponseTranslation.Contents.translated;
-                        translation.StatusCode = response.StatusCode.ToString();
-                        translation.Success.total = deserializedResponseTranslation.Success.total;
-
-                        AddTranslation(translation);
-                        return Json(new { success = true, translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
-                    }
-                    else
-                    {
-                        translation.Contents.text = text;
-                        translation.Contents.translation = translationType;
-                        translation.Contents.translated = null;
-                        translation.Error = new error { TranslationId = translation };
-                        translation.Error.code = deserializedResponseTranslation.Error.code;
-                        translation.Error.message = deserializedResponseTranslation.Error.message;
-
-                        AddTranslation(translation);
-                        return Json(new { success = false, errorCode = deserializedResponseTranslation.Error.code, errorMessage = deserializedResponseTranslation.Error.message }, JsonRequestBehavior.AllowGet);
-                    }
+                    AddTranslation(translation);
+                    return Json(new { success = true, translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
                 }
+                else
+                {
+                    translation.Contents.text = text;
+                    translation.Contents.translation = translationType;
+                    translation.Contents.translated = null;
+                    translation.Error = new error { TranslationId = translation };
+                    translation.Error.code = deserializedResponseTranslation.Error.code;
+                    translation.Error.message = deserializedResponseTranslation.Error.message;
+
+                    AddTranslation(translation);
+                    return Json(new { success = false, errorCode = deserializedResponseTranslation.Error.code, errorMessage = deserializedResponseTranslation.Error.message }, JsonRequestBehavior.AllowGet);
+                }
+            }
 
         }
 
