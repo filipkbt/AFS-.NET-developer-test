@@ -13,11 +13,11 @@ namespace AFS.NET_developer_test.Models
         public int Id { get; set; }
 
         public virtual TranslationModel TranslationId { get; set; }
-
+        
         public string translated { get; set; }
-
+        [Required]
         public string text { get; set; }
-
+        [Required]
         public string translation { get; set; }
     }
 }

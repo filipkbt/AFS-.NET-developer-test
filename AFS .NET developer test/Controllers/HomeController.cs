@@ -26,55 +26,56 @@ namespace AFS.NET_developer_test.Controllers
         {
             var _translationTypeUri = "/" + translationType + ".json";
 
-            if(text == "")
+            if (text == "" || translationType == "")
             {
                 return Json(new { success = false, message = "Write text you want to translate!" }, JsonRequestBehavior.AllowGet);
             }
 
-            using (var client = new HttpClient())
-            {
-                string BaseAddress = _baseTranslationsUri + _translationTypeUri;
-                client.BaseAddress = new Uri(BaseAddress);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                string jsonText = JsonConvert.SerializeObject(new { text = text });
-
-                var response = await client.PostAsync(BaseAddress, new StringContent(jsonText, Encoding.UTF8, "application/json"));
-
-                string responseTranslation = response.Content.ReadAsStringAsync().Result;
-                var deserializedResponseTranslation = JsonConvert.DeserializeObject<TranslationModel>(responseTranslation);
-
-                TranslationModel translation = new TranslationModel();
-                translation.Contents = new contents{ TranslationId = translation };
-                translation.Success = new success{ TranslationId = translation };
-                
-                translation.IsSuccessStatusCode = response.IsSuccessStatusCode;
-                translation.Date = DateTime.Now;
-
-                if (response.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    translation.Contents.text = deserializedResponseTranslation.Contents.text;
-                    translation.Contents.translation = deserializedResponseTranslation.Contents.translation;
-                    translation.Contents.translated = deserializedResponseTranslation.Contents.translated;
-                    translation.StatusCode = response.StatusCode.ToString();
-                    translation.Success.total = deserializedResponseTranslation.Success.total;
+                    string BaseAddress = _baseTranslationsUri + _translationTypeUri;
+                    client.BaseAddress = new Uri(BaseAddress);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    AddTranslation(translation);
-                    return Json(new { success = true, translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    translation.Contents.text = text;
-                    translation.Contents.translation = translationType;
-                    translation.Contents.translated = null;
-                    translation.Error = new error { TranslationId = translation };
-                    translation.Error.code = deserializedResponseTranslation.Error.code;
-                    translation.Error.message = deserializedResponseTranslation.Error.message;                   
+                    string jsonText = JsonConvert.SerializeObject(new { text = text });
 
-                    AddTranslation(translation);
-                    return Json(new { success = false, errorCode = deserializedResponseTranslation.Error.code , errorMessage = deserializedResponseTranslation.Error.message}, JsonRequestBehavior.AllowGet);
+                    var response = await client.PostAsync(BaseAddress, new StringContent(jsonText, Encoding.UTF8, "application/json"));
+
+                    string responseTranslation = response.Content.ReadAsStringAsync().Result;
+                    var deserializedResponseTranslation = JsonConvert.DeserializeObject<TranslationModel>(responseTranslation);
+
+                    TranslationModel translation = new TranslationModel();
+                    translation.Contents = new contents { TranslationId = translation };
+                    translation.Success = new success { TranslationId = translation };
+
+                    translation.IsSuccessStatusCode = response.IsSuccessStatusCode;
+                    translation.Date = DateTime.Now;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        translation.Contents.text = deserializedResponseTranslation.Contents.text;
+                        translation.Contents.translation = deserializedResponseTranslation.Contents.translation;
+                        translation.Contents.translated = deserializedResponseTranslation.Contents.translated;
+                        translation.StatusCode = response.StatusCode.ToString();
+                        translation.Success.total = deserializedResponseTranslation.Success.total;
+
+                        AddTranslation(translation);
+                        return Json(new { success = true, translated = translation.Contents.translated }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        translation.Contents.text = text;
+                        translation.Contents.translation = translationType;
+                        translation.Contents.translated = null;
+                        translation.Error = new error { TranslationId = translation };
+                        translation.Error.code = deserializedResponseTranslation.Error.code;
+                        translation.Error.message = deserializedResponseTranslation.Error.message;
+
+                        AddTranslation(translation);
+                        return Json(new { success = false, errorCode = deserializedResponseTranslation.Error.code, errorMessage = deserializedResponseTranslation.Error.message }, JsonRequestBehavior.AllowGet);
+                    }
                 }
-            }
+
         }
 
         public bool AddTranslation(TranslationModel translation)
@@ -105,8 +106,8 @@ namespace AFS.NET_developer_test.Controllers
             ViewBag.countAllResults = countAllResults;
             var progressBarProperlyTranslationsWidth = (((double)countProperlyTranslations / (double)countAllResults) * 100).ToString();
             var progressBarErrorsWidth = (((double)countErrors / (double)countAllResults) * 100).ToString();
-            ViewBag.progressBarProperlyTranslationsWidth = progressBarProperlyTranslationsWidth.Replace(",", "."); 
-            ViewBag.progressBarErrorsWidth = progressBarErrorsWidth.Replace(",", "."); 
+            ViewBag.progressBarProperlyTranslationsWidth = progressBarProperlyTranslationsWidth.Replace(",", ".");
+            ViewBag.progressBarErrorsWidth = progressBarErrorsWidth.Replace(",", ".");
             return View(resultsList);
         }
 
@@ -118,7 +119,7 @@ namespace AFS.NET_developer_test.Controllers
                                                 .Include("contents")
                                                 .Include("error")
                                                 .Include("success")
-                                                .OrderByDescending(x=> x.Date)
+                                                .OrderByDescending(x => x.Date)
                                                 .ToList();
 
                 if (filteredResults == "properlyTranslations")

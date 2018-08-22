@@ -21,6 +21,7 @@ namespace AFS.NET_developer_test.Models
 
         public bool IsSuccessStatusCode { get; set; }
 
+        [Required]
         public DateTime Date { get; set; }
 
     }
