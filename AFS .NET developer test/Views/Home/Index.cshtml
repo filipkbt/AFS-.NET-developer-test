@@ -1,19 +1,12 @@
 ﻿@{
     /**/
 
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Translator";
 }
 
 
 <script type="text/javascript">
 
-    $("#btn").on('click', function () {
-        var $this = $(this);
-        $this.button('loading');
-        setTimeout(function () {
-            $this.button('reset');
-        }, 8000);
-    });
  $(function() {
      $('#btnTranslateText').on('click', function () {
          var text = document.getElementById("textToTranslate").value;
@@ -55,6 +48,9 @@
                 });
     });
 
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 
 </script>
 
@@ -79,7 +75,7 @@
             </select>
         </div>
         <div class="col">
-            <div type="button" class="btn btn-success col-3" id="btnTranslateText" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Translation is in progres...">Translate text</div>
+            <div type="button" class="btn btn-success col-3" id="btnTranslateText" data-toggle="tooltip" title="Wait about 5 seconds to get response..." data-placement="bottom">Translate text</div>
         </div>
         <div class="col alert alert-success alert-dismissible fade collapse" role="alert" id="alertTranslatedText" aria-hidden="true">
             <h4 class="alert-heading">Translated text</h4>
@@ -89,7 +85,6 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
-
         <div class="col alert alert-danger alert-dismissible fade collapse" role="alert" id="alertErrorTranslating" aria-hidden="true">
             <h4 class="alert-heading">Error!</h4>
             <hr />

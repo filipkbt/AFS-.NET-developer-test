@@ -63,7 +63,6 @@ namespace AFS.NET_developer_test.Tests.Controllers
         public void TestAddTranslationShouldReturnFalse()
         {
             TranslationModel translation = new TranslationModel();
-
             Assert.AreEqual(_homeController.AddTranslation(translation),false);
         }
 
